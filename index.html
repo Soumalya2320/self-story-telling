@@ -1,1 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Boy Who Kept Going</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { margin: 0; }
+    .font-bangers { font-family: 'Bangers', cursive; letter-spacing: 2px; }
+    .font-comic { font-family: 'Comic Neue', cursive; }
+    .manga-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const HalftoneBackground = () => (
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none opacity-10"
+        style={{
+          backgroundImage: 'radial-gradient(circle, #000 2px, transparent 2.5px)',
+          backgroundSize: '16px 16px'
+        }}
+      />
+    );
+
+    const MangaPanel = ({ children, className = "", delay = 0 }) => {
+      const [isVisible, setIsVisible] = useState(false);
+
+      useEffect(() => {
+        const timer = setTimeout(() => setIsVisible(true), delay);
+        return () => clearTimeout(timer);
+      }, [delay]);
+
+      return (
+        <div 
+          className={`
+            bg-white border-4 border-black p-6 
+            shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] 
+            transition-all duration-700 transform
+            hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]
+            ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+            ${className}
+          `}
+        >
+          {children}
+        </div>
+      );
+    };
+
+    const NarrationBox = ({ children }) => (
+      <div className="bg-gray-100 border-2 border-black p-3 mb-4 font-comic text-sm md:text-base shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+        {children}
+      </div>
+    );
+
+    const SpeechBubble = ({ children, tailPosition = "left" }) => (
+      <div className="relative bg-white border-4 border-black p-4 rounded-2xl font-comic font-bold text-lg mb-4 inline-block z-10">
+        {children}
+        <div className={`absolute bottom-[-20px] ${tailPosition === 'left' ? 'left-8' : 'right-8'} w-0 h-0 
+          border-l-[10px] border-l-transparent 
+          border-r-[10px] border-r-transparent 
+          border-t-[20px] border-t-black`} 
+        />
+        <div className={`absolute bottom-[-14px] ${tailPosition === 'left' ? 'left-[34px]' : 'right-[34px]'} w-0 h-0 
+          border-l-[6px] border-l-transparent 
+          border-r-[6px] border-r-transparent 
+          border-t-[14px] border-t-white`} 
+        />
+      </div>
+    );
+
+    const AnimeBoy = ({ mood = "happy", className = "" }) => (
+      <svg viewBox="0 0 100 100" className={`w-24 h-24 ${className}`} fill="none" stroke="black" strokeWidth="4">
+        <path d="M 20 50 Q 10 30 30 20 Q 50 10 70 20 Q 90 30 80 50" fill="#3b82f6" />
+        <circle cx="50" cy="60" r="30" fill="#fde047" />
+        <circle cx="40" cy="55" r="4" fill="black" />
+        <circle cx="60" cy="55" r="4" fill="black" />
+        {mood === "happy" && <path d="M 40 65 Q 50 75 60 65" fill="none" strokeLinecap="round" />}
+        {mood === "thinking" && <path d="M 45 68 L 55 68" fill="none" strokeLinecap="round" />}
+        {mood === "determined" && <path d="M 40 65 Q 50 60 60 65" fill="none" strokeLinecap="round" />}
+        <path d="M 25 40 L 40 25 L 45 35 L 55 25 L 60 35 L 75 40 Z" fill="#3b82f6" strokeLinejoin="round" />
+      </svg>
+    );
+
+    const RadhikaAI = ({ className = "" }) => (
+      <svg viewBox="0 0 100 100" className={`w-24 h-24 ${className}`} fill="none" stroke="black" strokeWidth="4">
+        <ellipse cx="50" cy="20" rx="30" ry="10" stroke="#ec4899" strokeWidth="2" strokeDasharray="4 4" />
+        <circle cx="50" cy="55" r="25" fill="#fce7f3" stroke="#ec4899" />
+        <rect x="38" y="45" width="6" height="12" rx="3" fill="#ec4899" stroke="none" />
+        <rect x="56" y="45" width="6" height="12" rx="3" fill="#ec4899" stroke="none" />
+        <path d="M 45 60 Q 50 65 55 60" stroke="#ec4899" strokeLinecap="round" />
+        <path d="M 25 55 L 15 40 M 75 55 L 85 40" stroke="#ec4899" strokeLinecap="round" />
+        <circle cx="15" cy="40" r="4" fill="#ec4899" stroke="none" />
+        <circle cx="85" cy="40" r="4" fill="#ec4899" stroke="none" />
+      </svg>
+    );
+
+    function App() {
+      return (
+        <div className="min-h-screen bg-white text-black font-sans relative overflow-hidden pb-20">
+          <HalftoneBackground />
+
+          <div className="max-w-5xl mx-auto px-4 pt-12 relative z-10">
+            
+            <MangaPanel className="text-center mb-16 bg-yellow-300" delay={100}>
+              <h1 className="font-bangers text-6xl md:text-8xl mb-4 transform -rotate-2 uppercase">
+                The Boy Who<br/>Kept Going
+              </h1>
+              <div className="inline-block bg-black text-white font-comic font-bold px-6 py-2 text-xl md:text-2xl transform rotate-2">
+                A True Story • Born in West Bengal • Dreaming of the World
+              </div>
+            </MangaPanel>
+
+            <div className="flex flex-col gap-8">
+              <MangaPanel delay={300} className="md:w-3/4">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="text-4xl">📻</div>
+                  <h2 className="font-bangers text-4xl">One: A Curious Child</h2>
+                </div>
+                <NarrationBox>
+                  In November 2005, a boy was born in West Bengal. He was the kind of child who couldn't leave things alone...
+                </NarrationBox>
+                <div className="flex items-end gap-4">
+                  <AnimeBoy mood="thinking" />
+                  <SpeechBubble>What makes things work?!</SpeechBubble>
+                </div>
+                <p className="font-comic text-lg mt-4">
+                  Long before he had a name for it, he had the instinct of an engineer. He built a simple FM radio receiver from scratch. It was small. It was imperfect. <strong>But it worked.</strong>
+                </p>
+              </MangaPanel>
+
+              <MangaPanel delay={500} className="md:w-3/4 self-end bg-blue-50">
+                <div className="flex justify-end items-center gap-4 mb-4">
+                  <h2 className="font-bangers text-4xl">Two: Screens & Stories</h2>
+                  <div className="text-4xl">🎮</div>
+                </div>
+                <NarrationBox>
+                  Then came the internet. Then came games.
+                </NarrationBox>
+                <p className="font-comic text-lg mb-4 text-right">
+                  Free Fire wasn't just a game. It was a world where strategy mattered. He didn't just play—he was thinking. He dreamed of building gaming content and designing skins.
+                </p>
+                <div className="flex items-end justify-end gap-4">
+                  <SpeechBubble tailPosition="right">I have something worth sharing!</SpeechBubble>
+                  <AnimeBoy mood="happy" />
+                </div>
+              </MangaPanel>
+
+              <div className="manga-grid">
+                <MangaPanel delay={700}>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="text-4xl">🎓</div>
+                    <h2 className="font-bangers text-3xl">Three: IIT Madras</h2>
+                  </div>
+                  <NarrationBox>
+                    Stepping into one of India's most respected institutions...
+                  </NarrationBox>
+                  <p className="font-comic text-lg">
+                    He made a quiet decision: he would understand things, not just memorize them. He debugged his own thinking like he debugged his code.
+                  </p>
+                  <div className="mt-4 p-2 bg-black text-green-400 font-mono text-sm border-2 border-black">
+                    {`> debug_mindset(true);`}
+                    <br/>
+                    {`> finding_errors...`}
+                  </div>
+                </MangaPanel>
+
+                <MangaPanel delay={900} className="bg-pink-50">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="text-4xl">💔</div>
+                    <h2 className="font-bangers text-3xl">Four: The Year of Her</h2>
+                  </div>
+                  <NarrationBox>
+                    2024 arrived. He met her in a gaming group.
+                  </NarrationBox>
+                  <p className="font-comic text-lg mb-4">
+                    Late-night calls. Shared dreams. But eventually... it ended. Grief has its own timeline. But he did something remarkable. He turned pain into a project.
+                  </p>
+                  <div className="flex flex-col items-center mt-4">
+                    <RadhikaAI className="mb-2 animate-bounce" />
+                    <div className="flex items-center gap-2 bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="text-2xl">🤖</div>
+                      <span className="font-bold font-comic">Project: RADHIKA (Anime AI)</span>
+                    </div>
+                  </div>
+                </MangaPanel>
+              </div>
+
+              <MangaPanel delay={1100} className="w-full bg-gray-900 text-white">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="text-4xl">💻</div>
+                  <h2 className="font-bangers text-4xl tracking-widest text-yellow-400">Five: The Builder</h2>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <NarrationBox>
+                      <span className="text-black">He looked forward.</span>
+                    </NarrationBox>
+                    <p className="font-comic text-lg text-gray-300">
+                      JavaScript. Java. Vue. Next.js. Machine Learning. He asked what the formulas meant. He structured his days with intention. Early mornings. Exercise. Coding.
+                    </p>
+                  </div>
+                  <div className="flex flex-col justify-center items-center border-4 border-white p-4">
+                    <AnimeBoy mood="determined" className="w-32 h-32 mb-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                    <SpeechBubble tailPosition="left">
+                      <span className="text-black">Piece by piece, I build something better.</span>
+                    </SpeechBubble>
+                  </div>
+                </div>
+              </MangaPanel>
+
+              <MangaPanel delay={1300} className="md:w-3/4 ml-auto bg-blue-100">
+                 <div className="flex items-center gap-4 mb-4 justify-end">
+                  <h2 className="font-bangers text-4xl">Six: The Horizon</h2>
+                  <div className="text-4xl">🚀</div>
+                </div>
+                <NarrationBox>
+                  He knows what he wants. By 2029...
+                </NarrationBox>
+                <p className="font-comic text-xl font-bold mb-2">
+                  MIT. Stanford. Harvard.
+                </p>
+                <p className="font-comic text-lg mb-4">
+                  Not as fantasies, but as destinations. A Senior Data Scientist shaping decisions that move the world's money. Where curiosity becomes strategy.
+                </p>
+              </MangaPanel>
+
+              <MangaPanel delay={1500} className="text-center w-full border-8">
+                <div className="text-6xl mx-auto mb-4">⚡</div>
+                <h2 className="font-bangers text-5xl mb-6">Epilogue: Still Unfolding</h2>
+                <div className="flex justify-center mb-6">
+                   <AnimeBoy mood="happy" className="w-40 h-40" />
+                </div>
+                <p className="font-comic text-2xl font-bold max-w-2xl mx-auto">
+                  He is not finished. The chapters ahead haven't been written yet. But if the ones before tell us anything, it is this: he will keep going.
+                </p>
+                <div className="mt-8 bg-black text-white font-bangers text-4xl p-4 inline-block transform rotate-1">
+                  THE BEST PARTS ARE STILL AHEAD!
+                </div>
+              </MangaPanel>
+
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // This tells React to draw everything on the screen!
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
